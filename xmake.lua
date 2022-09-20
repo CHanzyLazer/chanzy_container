@@ -9,7 +9,6 @@ end
 
 target("chanzy_container")
     set_kind("headeronly")
-    add_headerfiles("src/*.hpp")
 target_end()
 
 target("chanzy_container_test")

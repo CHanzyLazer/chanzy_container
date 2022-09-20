@@ -1,9 +1,9 @@
 #pragma once
-#include "flat_map.hpp"
-#include "linked_cell.hpp"
-#include "position.hpp"
-#include "sorted_vector.hpp"
-#include "proxy.hpp"
+#include "chanzy/flat_map.hpp"
+#include "chanzy/linked_cell.hpp"
+#include "chanzy/position.hpp"
+#include "chanzy/sorted_vector.hpp"
+#include "chanzy/proxy.hpp"
 #include <iostream>
 
 using namespace std;
