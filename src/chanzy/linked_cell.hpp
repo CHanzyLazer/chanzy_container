@@ -5,6 +5,7 @@
 #pragma warning(disable: 4514)
 #pragma warning(disable: 4061)
 #endif
+
 #include "position.hpp"
 #include "common_excetion.hpp"
 #include <vector>
@@ -14,19 +15,19 @@
 
 
 namespace chanzy {
-
+    
     enum class LC_BOU {
         none, PBC, FBC
     };
-
+    
     using std::floor;
     using std::cout;
     using std::cin;
     using std::endl;
     using std::vector;
     using std::array;
-
-
+    
+    
     template<class Cell_Type>
     class linked_cell;
 
@@ -42,11 +43,11 @@ namespace chanzy {
         //构造函数部分
     private:
         inline link() : m_data_ptr(nullptr), m_direction(0.0, 0.0, 0.0), m_mirror(false), m_center(true) {}
-        inline explicit link(Cell_Type* const a_ptr, bool a_mirror = false, const double& a_dx = 0.0, const double& a_dy = 0.0, const double &a_dz = 0.0, bool a_center = true) :
+        inline explicit link(Cell_Type* const a_ptr, bool a_mirror = false, const double& a_dx = 0.0, const double& a_dy = 0.0, const double& a_dz = 0.0, bool a_center = true) :
         m_data_ptr(a_ptr), m_direction(a_dx, a_dy, a_dz), m_mirror(a_mirror), m_center(a_center) {}
         //重写指针常用操作
     public:
-        inline Cell_Type& operator*() { return* m_data_ptr; }
+        inline Cell_Type& operator*() { return *m_data_ptr; }
         inline const Cell_Type& operator*() const { return *m_data_ptr; }
         inline Cell_Type* operator->() { return m_data_ptr; }
         inline const Cell_Type* operator->() const { return m_data_ptr; }
@@ -82,25 +83,25 @@ namespace chanzy {
         // 不再存储所有 links 而是即时运算来节约内存，使用成员变量避免重复allocate内存，不过此时不再线程安全
         container_links t_cell_links;
         container_links t_empty_links;
-
+        
         int m_dimension;
         int m_size_x, m_size_y, m_size_z; // = (int)floor(m_length_x/m_length_cell)
         LC_BOU m_link_type_x, m_link_type_y, m_link_type_z;
         double m_length_x, m_length_y, m_length_z;
         double m_length_cell; // 将 cell 的大小管理纳入
-
-
+        
+        
         /*----------------------*/
         //迭代器部分
     public:
         using cell_iterator = typename cell_database::iterator;
         using const_cell_iterator = typename cell_database::const_iterator;
-
+        
         inline cell_iterator begin() { return cell_iterator(m_database.begin()); }
         inline const_cell_iterator begin() const { return const_cell_iterator(m_database.begin()); }
         inline cell_iterator end() { return cell_iterator(m_database.end()); }
         inline const_cell_iterator end() const { return const_cell_iterator(m_database.end()); }
-
+        
         /*----------------------*/
         //构造函数，指定三维大小，最后可选参数指定链接的类型
     public:
@@ -116,10 +117,10 @@ namespace chanzy {
                     LC_BOU p1, const double& a_length_x,
                     LC_BOU p2, const double& a_length_y,
                     LC_BOU p3, const double& a_length_z);
-
+        
         /*----------------------*/
         //不需要重写以下函数保证链接的指针正确性，因为已经禁止拷贝了
-
+        
         /*----------------------*/
         //内部函数
     private:
@@ -166,7 +167,7 @@ namespace chanzy {
         void index_3d_at(const double& a_d_x, const double& a_d_y, const double& a_d_z, int& x, int& y, int& z) const;
         // 根据三维坐标返回单下标，有边界检查
         int index_1d_at(const double& a_d_x, const double& a_d_y, const double& a_d_z) const;
-
+        
         //根据三维下标返回迭代器
         inline cell_iterator get_iterator(const int& a_x = 0, const int& a_y = 0, const int& a_z = 0)
         { return begin() + index_1d(a_x, a_y, a_z); }
@@ -186,10 +187,10 @@ namespace chanzy {
         { return this->links_at(a_pos[0], a_pos[1], a_pos[2]); }
         inline const container_links& links_at(const Position& a_pos) const
         { return const_cast<linked_cell*>(this)->links_at(a_pos[0], a_pos[1], a_pos[2]); }
-
+        
         //使用默认初始化清空每个cell，不改变link
         void clear_cell();
-
+        
         /*----------------------*/
         //debug接口
     public:
@@ -199,7 +200,7 @@ namespace chanzy {
         void print_link(const int& a_x, const int& a_y = 0, const int& a_z = 0) const;
         //按照迭代器顺序从0开始递增赋值数据，类型必须支持前置++
         void assign_increase();
-
+        
         /*----------------------*/
         //重载运算符，[]和（）都应只返回single_cell<Cell_Type>的数据data（Cell_Type）的引用
     public:
@@ -225,7 +226,7 @@ namespace chanzy {
         inline Cell_Type* at_ptr(const Position& a_pos) { return this->at_ptr(a_pos[0], a_pos[1], a_pos[2]); }
         inline const Cell_Type* at_ptr(const Position& a_pos) const
         { return this->at_ptr(a_pos[0], a_pos[1], a_pos[2]); }
-
+        
         /*----------------------*/
         //实现移动构造函数和拷贝构造函数，来方便使用 vector 来存储
     public:
@@ -234,7 +235,7 @@ namespace chanzy {
         linked_cell& operator=(const linked_cell& a_rhs);
         linked_cell& operator=(linked_cell&& a_rhs) noexcept;
     };
-
+    
 /*----------------------*/
 //自定义迭代器
 // 直接移除 //
@@ -248,7 +249,7 @@ namespace chanzy {
         t_cell_links.clear();
         t_empty_links.clear();
     }
-
+    
     template<class Cell_Type>
     void linked_cell<Cell_Type>::_set_link_cell(const int& a_x, const int& a_y, const int& a_z) {
         t_cell_links.clear();//push_back前先清空
@@ -279,12 +280,12 @@ namespace chanzy {
             }
         }
     }
-
+    
     template<class Cell_Type>
     void linked_cell<Cell_Type>::_push_link_cell(int a_x, int a_y, int a_z, const int& ofs_x, const int& ofs_y, const int& ofs_z) {
         double d_x = 0.0, d_y = 0.0, d_z = 0.0;
         bool t_mirror = false;
-
+        
         if (m_link_type_x == LC_BOU::PBC) {
             t_mirror |= true;
             a_x += ofs_x;
@@ -301,7 +302,7 @@ namespace chanzy {
         } else {
             if (ofs_x != 0) { return; }
         }
-
+        
         if (m_link_type_y == LC_BOU::PBC) {
             t_mirror |= true;
             a_y += ofs_y;
@@ -318,7 +319,7 @@ namespace chanzy {
         } else {
             if (ofs_y != 0) { return; }
         }
-
+        
         if (m_link_type_z == LC_BOU::PBC) {
             t_mirror |= true;
             a_z += ofs_z;
@@ -335,16 +336,15 @@ namespace chanzy {
         } else {
             if (ofs_z != 0) { return; }
         }
-
+        
         t_cell_links.push_back(cell_link(&(this->operator()(a_x, a_y, a_z)), t_mirror, d_x, d_y, d_z, (ofs_x == 0 && ofs_y == 0 && ofs_z == 0)));
     }
-
+    
 /*----------------------*/
 //设置尺寸，直接使用vector的resize函数
     template<class Cell_Type>
     void
-    linked_cell<Cell_Type>::set_cell(const double& a_length_cell, const double& a_length_x, const double& a_length_y,
-                                     const double& a_length_z) {
+    linked_cell<Cell_Type>::set_cell(const double& a_length_cell, const double& a_length_x, const double& a_length_y, const double& a_length_z) {
         m_length_cell = a_length_cell;
         m_length_x = a_length_x;
         m_length_y = a_length_y;
@@ -364,7 +364,7 @@ namespace chanzy {
         }
         m_database.resize(m_size_x * m_size_y * m_size_z, Cell_Type());
     }
-
+    
 //依据参数设置链接
     template<class Cell_Type>
     inline void linked_cell<Cell_Type>::set_link_parameter(const LC_BOU p1, const LC_BOU p2, const LC_BOU p3) {
@@ -372,7 +372,7 @@ namespace chanzy {
         m_link_type_y = p2;
         m_link_type_z = p3;
     }
-
+    
     template<class Cell_Type>
     inline void linked_cell<Cell_Type>::index_3d(const int& a_i, int& x, int& y, int& z) const {
 #ifdef CHANZY_DEBUG
@@ -383,7 +383,7 @@ namespace chanzy {
         y = (a_i / m_size_x) % m_size_y;
         z = a_i / (m_size_x * m_size_y);
     }
-
+    
     template<class Cell_Type>
     inline int linked_cell<Cell_Type>::index_1d(const int& a_x, const int& a_y, const int& a_z) const {
 #ifdef CHANZY_DEBUG
@@ -392,7 +392,7 @@ namespace chanzy {
 #endif
         return (a_x + m_size_x * a_y + m_size_x * m_size_y * a_z);
     }
-
+    
     template<class Cell_Type>
     inline void
     linked_cell<Cell_Type>::index_3d_at(const double& a_d_x, const double& a_d_y, const double& a_d_z, int& x, int& y,
@@ -408,7 +408,7 @@ namespace chanzy {
         z = (int) floor(a_d_z / m_length_cell);
         if (z >= m_size_z) z = m_size_z - 1;
     }
-
+    
     template<class Cell_Type>
     inline int
     linked_cell<Cell_Type>::index_1d_at(const double& a_d_x, const double& a_d_y, const double& a_d_z) const {
@@ -424,7 +424,7 @@ namespace chanzy {
         if (t_k >= m_size_z) t_k = m_size_z - 1;
         return index_1d(t_i, t_j, t_k);
     }
-
+    
     template<class Cell_Type>
     void linked_cell<Cell_Type>::clear_cell() {
         cell_iterator cell_it = this->begin();
@@ -435,7 +435,7 @@ namespace chanzy {
         t_cell_links.clear();
         t_empty_links.clear();
     }
-
+    
 /*----------------------*/
     template<class Cell_Type>
     void linked_cell<Cell_Type>::print_cell() const {
@@ -465,17 +465,17 @@ namespace chanzy {
             }
         }
     }
-
+    
     template<class Cell_Type>
     void linked_cell<Cell_Type>::print_link(const int& a_x, const int& a_y, const int& a_z) const {
         auto& t_links = this->get_links(a_x, a_y, a_z);
-        for (cell_link t_link: t_links) {
+        for (cell_link t_link : t_links) {
             cout << *t_link << " ";
         }
         cout << endl;
         cout << "links capacity: " << t_cell_links.capacity() << endl;
     }
-
+    
     template<class Cell_Type>
     void linked_cell<Cell_Type>::assign_increase() {
         Cell_Type t_sum = Cell_Type();
@@ -485,7 +485,7 @@ namespace chanzy {
             ++t_sum;
         }
     }
-
+    
 /*----------------------*/
     template<class Cell_Type>
     inline linked_cell<Cell_Type>::linked_cell(
@@ -503,7 +503,7 @@ namespace chanzy {
             m_length_z(a_length_z) {
         m_length_cell = std::numeric_limits<double>::max();
     }
-
+    
     template<class Cell_Type>
     inline linked_cell<Cell_Type>::linked_cell(const double& a_length_cell,
                                                const LC_BOU p1, const double& a_length_x) :
@@ -521,7 +521,7 @@ namespace chanzy {
         if (m_size_x < 1) m_size_x = 1;
         _init_linked_cell();
     }
-
+    
     template<class Cell_Type>
     inline linked_cell<Cell_Type>::linked_cell(const double& a_length_cell,
                                                const LC_BOU p1, const double& a_length_x,
@@ -541,7 +541,7 @@ namespace chanzy {
         if (m_size_y < 1) m_size_y = 1;
         _init_linked_cell();
     }
-
+    
     template<class Cell_Type>
     inline linked_cell<Cell_Type>::linked_cell(const double& a_length_cell,
                                                const LC_BOU p1, const double& a_length_x,
@@ -563,7 +563,7 @@ namespace chanzy {
         if (m_size_z < 1) m_size_z = 1;
         _init_linked_cell();
     }
-
+    
     template<class Cell_Type>
     linked_cell<Cell_Type>::linked_cell() :
             m_dimension(0),
@@ -578,7 +578,7 @@ namespace chanzy {
             m_length_z(1.0) {
         m_length_cell = std::numeric_limits<double>::max();
     }
-
+    
     template<class Cell_Type>
     linked_cell<Cell_Type>::linked_cell(const linked_cell& a_rhs) {
         m_database = a_rhs.m_database;
@@ -641,5 +641,5 @@ namespace chanzy {
         m_length_cell = a_rhs.m_length_cell;
         return *this;
     }
-
+    
 }

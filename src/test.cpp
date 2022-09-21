@@ -1,4 +1,5 @@
 #pragma once
+
 #include "chanzy/flat_map.hpp"
 #include "chanzy/linked_cell.hpp"
 #include "chanzy/position.hpp"
@@ -17,6 +18,7 @@ inline ostream& operator<<(ostream& a_cout, const sorted_vector<Entry>& a_sv) {
     }
     return a_cout;
 }
+
 template<typename Key, typename Value>
 inline ostream& operator<<(ostream& a_cout, const flat_map<Key, Value>& a_fm) {
     for (auto t_it = a_fm.begin(); t_it != a_fm.end(); ++t_it) {
@@ -28,8 +30,8 @@ inline ostream& operator<<(ostream& a_cout, const flat_map<Key, Value>& a_fm) {
 
 inline void test_sorted_vector() {
     cout << "========= test_sorted_vector =========" << endl;
-
-    sorted_vector<double> t_sv {1.0, 2.0, 1.0, 0.8, 3.0};
+    
+    sorted_vector<double> t_sv{1.0, 2.0, 1.0, 0.8, 3.0};
     cout << t_sv << endl;
     auto t_it = t_sv.lower_bound(1.3);
     cout << *t_it << endl;
@@ -44,7 +46,7 @@ inline void test_sorted_vector() {
 
 inline void test_flat_map() {
     cout << "========= test_flat_map =========" << endl;
-
+    
     clock_t t_start, t_end;
     t_start = clock();
     flat_map<double, double> t_fm;
@@ -53,16 +55,16 @@ inline void test_flat_map() {
     }
     t_end = clock();
     cout << "flat_map insert time = " << double(t_end - t_start) / CLOCKS_PER_SEC << " s" << endl;
-
+    
 }
 
 inline void test_proxy() {
     cout << "========= test_proxy =========" << endl;
-
+    
     using e_pair = pair<double, double>;
     using vec = vector<e_pair>;
     vec t_v {{1.0, 0.1}, {1.0, 0.1}, {3.0, 0.3}, {2.0, 0.2}};
-
+    
     auto t_it = t_v.begin();
     chanzy::custom_iterator<vec::iterator, const double&, double*, chanzy::convertor::Pair_to_Value_ref, chanzy::convertor::Pair_to_Value_poi> t_p_it (t_it);
     cout << *t_p_it << endl;
@@ -72,7 +74,7 @@ inline void test_proxy() {
 
 inline void test_linked_cell() {
     cout << "========= linked_cell =========" << endl;
-
+    
     linked_cell<Position> t_lc;
     t_lc.set_link_parameter(LC_BOU::PBC, LC_BOU::PBC);
     t_lc.set_cell(1.0, 3.0, 3.0, 3.0);

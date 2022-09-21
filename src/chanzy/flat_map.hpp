@@ -16,31 +16,30 @@
 namespace chanzy {
     
     using std::pair;
-
+    
     
 /// 顺便实现了 flat map，由于是 flat 的所以可以有重复 key
-    template<class Key, class Value, class Compare = std::less<Key>, class Alloc = std::allocator<pair<Key, Value>> >
+    template<class Key, class Value, class Compare = std::less<Key>, class Alloc = std::allocator<pair<Key, Value>>>
     class flat_map final {
     private:
         using _pair = pair<Key, Value>;
         using _vec = std::vector<_pair, Alloc>;
         _vec m_vector;
         using _pair_out = pair<const Key&, Value&>;
-
+        
     private:
         class _key_compare {
         private:
             Compare m_comp;
         public:
-            inline _key_compare(): m_comp() {}
+            inline _key_compare() : m_comp() {}
             inline bool operator()(const _pair& a_x, const _pair& a_y) const // sort 使用
             { return m_comp(a_x.first, a_y.first); }
             inline bool operator()(const Key& a_x, const _pair& a_y) const // binary_search 使用
             { return m_comp(a_x, a_y.first); }
-            inline bool operator()(const _pair& a_x, const Key& a_y) const
-            { return m_comp(a_x.first, a_y); }
+            inline bool operator()(const _pair& a_x, const Key& a_y) const { return m_comp(a_x.first, a_y); }
         };
-
+        
 /// 提供构造函数和赋值运算
     public:
         inline flat_map() : m_vector() {}
@@ -49,13 +48,15 @@ namespace chanzy {
         inline flat_map(std::initializer_list<_pair> a_list, const Alloc& a_al = Alloc()) : m_vector(a_list, a_al) { std::sort(m_vector.begin(), m_vector.end(), _key_compare()); }
         inline flat_map& operator=(const flat_map& a_fm) { m_vector = a_fm.m_vector; return *this; }
         inline flat_map& operator=(flat_map&& a_fm) noexcept { m_vector = std::move(a_fm.m_vector); return *this; }
-
+        
 /// 迭代器部分，需要自行实现一份来实现 key 为 const 的情况
     private:
         template<class Iterator_Type>
         class iterator_flat_map;
+        
         template<class Iterator_Type>
         class const_iterator_flat_map;
+        
         using _iterator_vec = typename _vec::iterator;
         using _const_iterator_vec = typename _vec::const_iterator;
         using _riterator_vec = typename _vec::const_reverse_iterator;
@@ -67,23 +68,23 @@ namespace chanzy {
         inline iterator begin() { return iterator(m_vector.begin()); }
         inline const_iterator end() const { return const_iterator(m_vector.end()); }
         inline iterator end() { return iterator(m_vector.end()); }
-
+        
         using reverse_iterator = iterator_flat_map<_riterator_vec>;
         using const_reverse_iterator = const_iterator_flat_map<_const_riterator_vec>;
         inline const_reverse_iterator rbegin() const { return const_reverse_iterator(m_vector.rbegin()); }
         inline reverse_iterator rbegin() { return reverse_iterator(m_vector.rbegin()); }
         inline const_reverse_iterator rend() const { return const_reverse_iterator(m_vector.rend()); }
         inline reverse_iterator rend() { return reverse_iterator(m_vector.rend()); }
-
+        
 /// 内部接口
     private:
-        inline _const_iterator_vec _lower_bound(const Key& a_key) const                             { return std::lower_bound(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
-        inline _iterator_vec _lower_bound(const Key& a_key)                                         { return std::lower_bound(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
-        inline _const_iterator_vec _upper_bound(const Key& a_key) const                             { return std::upper_bound(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
-        inline _iterator_vec _upper_bound(const Key& a_key)                                         { return std::upper_bound(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
-        inline pair<_const_iterator_vec, _const_iterator_vec> _equal_range(const Key& a_key) const  { return std::equal_range(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
-        inline pair<_iterator_vec, _iterator_vec> _equal_range(const Key& a_key)                    { return std::equal_range(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
-        inline bool _binary_search(const Key& a_key) const                                          { return std::binary_search(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
+        inline _const_iterator_vec _lower_bound(const Key& a_key) const { return std::lower_bound(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
+        inline _iterator_vec _lower_bound(const Key& a_key) { return std::lower_bound(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
+        inline _const_iterator_vec _upper_bound(const Key& a_key) const { return std::upper_bound(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
+        inline _iterator_vec _upper_bound(const Key& a_key) { return std::upper_bound(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
+        inline pair<_const_iterator_vec, _const_iterator_vec> _equal_range(const Key& a_key) const { return std::equal_range(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
+        inline pair<_iterator_vec, _iterator_vec> _equal_range(const Key& a_key) { return std::equal_range(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
+        inline bool _binary_search(const Key& a_key) const { return std::binary_search(m_vector.begin(), m_vector.end(), a_key, _key_compare()); }
 /// 常用接口
     public:
         using size_type = typename _vec::size_type;
@@ -130,8 +131,8 @@ namespace chanzy {
         // 随机访问
         inline _pair_out at_pos(const size_type a_pos) const { _pair& t_pair = m_vector.at(a_pos); return {t_pair.first, t_pair.second}; }
         inline _pair_out at_pos(const size_type a_pos) { _pair& t_pair = m_vector.at(a_pos); return {t_pair.first, t_pair.second}; }
-
-
+        
+        
 /// 不常用的实用接口
     public:
         inline void swap(flat_map& a_fm) { m_vector.swap(a_fm.m_vector); }
@@ -142,8 +143,8 @@ namespace chanzy {
         inline void reserve(const size_type a_size) { m_vector.reserve(a_size); }
         inline size_type capacity() const { return m_vector.capacity(); }
     };
-
-
+    
+    
 /// 迭代器部分，将原本的返回 pair 改为专门的 key 和 value 函数
     template<class Key, class Value, class Compare, class Alloc>
     template<class Iterator_Type>
@@ -165,11 +166,11 @@ namespace chanzy {
             return m_it->second;
         }
     public:
-        inline explicit iterator_flat_map(const Iterator_Type& a_it): m_it(a_it) {}
-    /// 还是需要自己实现这些接口，麻烦
+        inline explicit iterator_flat_map(const Iterator_Type& a_it) : m_it(a_it) {}
+        /// 还是需要自己实现这些接口，麻烦
     public:
         using difference_type = typename Iterator_Type::difference_type;
-
+        
         inline Value& operator*() const { return *m_it; }
         inline Value* operator->() const { return &(*m_it); }
         // Random access iterator requirements
@@ -190,15 +191,16 @@ namespace chanzy {
         inline iterator operator+(difference_type a_pos) const { return iterator(m_it + a_pos); }
         inline iterator& operator-=(difference_type a_pos) { m_it -= a_pos; return *this; }
         inline iterator operator-(difference_type a_pos) const { return iterator(m_it - a_pos); }
-
+        
         inline difference_type operator-(const const_iterator& rhs) const { return m_it - rhs.m_it; }
     };
-
+    
     template<class Key, class Value, class Compare, class Alloc>
     template<class Iterator_Type>
     class flat_map<Key, Value, Compare, Alloc>::const_iterator_flat_map {
     private:
         friend class flat_map<Key, Value, Compare, Alloc>;
+        
         Iterator_Type m_it;
         inline const Iterator_Type& _iter() const {
             return m_it;
@@ -212,13 +214,13 @@ namespace chanzy {
             return m_it->second;
         }
     public:
-        inline explicit const_iterator_flat_map(const Iterator_Type& a_it): m_it(a_it) {}
+        inline explicit const_iterator_flat_map(const Iterator_Type& a_it) : m_it(a_it) {}
         // 提供直接转换成 const 迭代器的接口
-        inline const_iterator_flat_map(const iterator& a_it): m_it(a_it._iter()) {} // NOLINT(google-explicit-constructor)
-    /// 还是需要自己实现这些接口，麻烦
+        inline const_iterator_flat_map(const iterator& a_it) : m_it(a_it._iter()) {} // NOLINT(google-explicit-constructor)
+        /// 还是需要自己实现这些接口，麻烦
     public:
         using difference_type = typename Iterator_Type::difference_type;
-
+        
         inline const Value& operator*() const { return *m_it; }
         inline const Value* operator->() const { return &(*m_it); }
         // Random access iterator requirements
@@ -239,12 +241,11 @@ namespace chanzy {
         inline const_iterator operator+(difference_type a_pos) const { return const_iterator(m_it + a_pos); }
         inline const_iterator& operator-=(difference_type a_pos) { m_it -= a_pos; return *this; }
         inline const_iterator operator-(difference_type a_pos) const { return const_iterator(m_it - a_pos); }
-
+        
         inline difference_type operator-(const const_iterator& rhs) const { return m_it - rhs.m_it; }
     };
-
-
-
+    
+    
     template<class Key, class Value, class Compare, class Alloc>
     inline bool flat_map<Key, Value, Compare, Alloc>::push_back(const _pair& a_pair) {
         if (!this->empty() && Compare()(a_pair.first, this->back())) return false;
@@ -273,8 +274,8 @@ namespace chanzy {
 #endif
         m_vector.push_back(std::move(a_pair));
     }
-
-
+    
+    
     template<class Key, class Value, class Compare, class Alloc>
     inline typename flat_map<Key, Value, Compare, Alloc>::const_iterator
     flat_map<Key, Value, Compare, Alloc>::find(const Key& a_key) const {
@@ -289,16 +290,16 @@ namespace chanzy {
         if (t_it != this->end() && t_it.key() == a_key) return t_it;
         return this->end();
     }
-
-
+    
+    
     template<class Key, class Value, class Compare, class Alloc>
     inline typename flat_map<Key, Value, Compare, Alloc>::difference_type
     flat_map<Key, Value, Compare, Alloc>::count(const Key& a_key) const {
         std::pair<const_iterator, const_iterator> t_pair = this->equal_range(a_key);
         return t_pair.second - t_pair.first;
     }
-
-
+    
+    
     template<class Key, class Value, class Compare, class Alloc>
     inline std::pair<typename flat_map<Key, Value, Compare, Alloc>::iterator, bool>
     flat_map<Key, Value, Compare, Alloc>::insert_map(const _pair& a_pair) {
@@ -318,14 +319,14 @@ namespace chanzy {
     template<class Key, class Value, class Compare, class Alloc>
     inline std::pair<typename flat_map<Key, Value, Compare, Alloc>::iterator, bool>
     flat_map<Key, Value, Compare, Alloc>::insert(const const_iterator a_where, const _pair& a_pair) {
-        if ((a_where != this->end() && Compare()(*a_where, a_pair.first)) || (a_where != this->begin() && Compare()(a_pair.first, *(a_where-1))))
+        if ((a_where != this->end() && Compare()(*a_where, a_pair.first)) || (a_where != this->begin() && Compare()(a_pair.first, *(a_where - 1))))
             return {a_where, false};
         return {iterator(m_vector.insert(a_where._iter(), a_pair)), true};
     }
     template<class Key, class Value, class Compare, class Alloc>
     inline std::pair<typename flat_map<Key, Value, Compare, Alloc>::iterator, bool>
     flat_map<Key, Value, Compare, Alloc>::insert(const const_iterator a_where, _pair&& a_pair) {
-        if ((a_where != this->end() && Compare()(*a_where, a_pair.first)) || (a_where != this->begin() && Compare()(a_pair.first, *(a_where-1))))
+        if ((a_where != this->end() && Compare()(*a_where, a_pair.first)) || (a_where != this->begin() && Compare()(a_pair.first, *(a_where - 1))))
             return {a_where, false};
         return {iterator(m_vector.insert(a_where._iter(), std::move(a_pair))), true};
     }
@@ -333,7 +334,7 @@ namespace chanzy {
     inline typename flat_map<Key, Value, Compare, Alloc>::iterator
     flat_map<Key, Value, Compare, Alloc>::insert_(const const_iterator a_where, const _pair& a_pair) {
 #ifdef CHANZY_DEBUG
-        if ((a_where != this->end() && Compare()(*a_where, a_pair.first)) || (a_where != this->begin() && Compare()(a_pair.first, *(a_where-1))))
+        if ((a_where != this->end() && Compare()(*a_where, a_pair.first)) || (a_where != this->begin() && Compare()(a_pair.first, *(a_where - 1))))
             throw Exception_container("insert_ key must make sure the map in order");
 #endif
         return iterator(m_vector.insert(a_where._iter(), a_pair));
@@ -342,7 +343,7 @@ namespace chanzy {
     inline typename flat_map<Key, Value, Compare, Alloc>::iterator
     flat_map<Key, Value, Compare, Alloc>::insert_(const const_iterator a_where, _pair&& a_pair) {
 #ifdef CHANZY_DEBUG
-        if ((a_where != this->end() && Compare()(*a_where, a_pair.first)) || (a_where != this->begin() && Compare()(a_pair.first, *(a_where-1))))
+        if ((a_where != this->end() && Compare()(*a_where, a_pair.first)) || (a_where != this->begin() && Compare()(a_pair.first, *(a_where - 1))))
             throw Exception_container("insert_ key must make sure the map in order");
 #endif
         return iterator(m_vector.insert(a_where._iter(), std::move(a_pair)));
@@ -357,8 +358,8 @@ namespace chanzy {
     flat_map<Key, Value, Compare, Alloc>::erase(const const_iterator a_first, const const_iterator a_last) {
         return iterator(m_vector.erase(a_first._iter(), a_last._iter()));
     }
-
-
+    
+    
     template<class Key, class Value, class Compare, class Alloc>
     inline typename flat_map<Key, Value, Compare, Alloc>::difference_type
     flat_map<Key, Value, Compare, Alloc>::remove(const Key& a_key) {
@@ -368,9 +369,8 @@ namespace chanzy {
         m_vector.erase(t_pair.first, t_pair.second);
         return t_out;
     }
-
-
-
+    
+    
     template<class Key, class Value, class Compare, class Alloc>
     const Value& flat_map<Key, Value, Compare, Alloc>::at(const Key& a_key) const {
         const_iterator t_it = this->lower_bound(a_key);
@@ -396,9 +396,8 @@ namespace chanzy {
             t_it = m_vector.insert(t_it, {a_key, Value()});
         return t_it->second;
     }
-
-
-
+    
+    
 }
 
 
