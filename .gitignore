@@ -1,0 +1,23 @@
+# Xmake cache
+.xmake/
+build/
+
+# MacOS Cache
+.DS_Store
+
+# CLion Cache
+.idea/
+cmake*/
+
+# compile_commands file
+compile_commands.json
+
+# cmake file
+CMakeLists.txt
+
+# vs file
+vs2022/
+vsxmake2022/
+
+# other Cache
+.*/
