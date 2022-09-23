@@ -18,6 +18,11 @@ target("your target name")
      add_packages("chanzy_container")
 ```
 
+For the xmake whose version is lower than `v2.7.2`, you need to set the branch manually:
+```lua
+add_repositories("chanzy_repo https://github.com/CHanzyLazer/chanzy_repo.git main")
+```
+
 Then you can include one of it on your source code like this:
 ```cpp
 #include <chanzy/sorted_vector.hpp>
